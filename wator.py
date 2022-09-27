@@ -15,8 +15,7 @@ class Monde:
         
         pass
 
-__init__()
-afficher_monde()
+
 
 """
 
