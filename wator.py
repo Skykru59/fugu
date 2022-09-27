@@ -4,6 +4,7 @@ import os
 
 class Monde:
     def __init__(self, largeur, hauteur):
+<<<<<<< HEAD
         self.largeur = largeur
         self.hauteur = hauteur
         self.grille = [[ None for _ in range(largeur)] for _ in range(hauteur)]
@@ -19,6 +20,15 @@ class Monde:
 
 """
 
+=======
+        self.largeur = 10
+        self.hauteur = 8
+        self.grille = [[ None for _ in range(largeur)] for _ in range(hauteur)]
+    
+    def afficher_monde(self):
+        pass
+
+>>>>>>> 9183733a07ad7b80e39b127aa40cc5d7eb215eb0
     def peupler(self, nb_poisson, nb_requin):
         pass
     
@@ -37,4 +47,7 @@ class Poisson:
         
     def vivre_une_journee(self, monde):
         pass
+<<<<<<< HEAD
 """
+=======
+>>>>>>> 9183733a07ad7b80e39b127aa40cc5d7eb215eb0
