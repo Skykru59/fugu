@@ -9,14 +9,7 @@ print(self)'''
 
 
 grilleJoueur=[[' ' for i in range(8)] for i in range(10)]
-print(grilleJoueur)
-
-
-
-print()
 for i in grilleJoueur:
-
-
     print(i)
     
  
