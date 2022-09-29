@@ -61,18 +61,18 @@ class Poisson:
     def deplacement_possible(self, monde):
         coup_possibles= []
         if monde.grille[(self.y+1)%monde.hauteur][self.x] == " ":
-            coup_possibles.append((self.y+1)%monde.hauteur),(self.x)
+            coup_possibles.append(((self.y+1)%monde.hauteur,self.x))
 
         if monde.grille[(self.y-1)%monde.hauteur][self.x] == " ":
-            coup_possibles.append((self.y-1)%monde.hauteur),(self.x)
+            coup_possibles.append(((self.y-1)%monde.hauteur,self.x))
 
 
         if monde.grille[self.y][(self.x+1)%monde.largeur] == " ":
-            coup_possibles.append((self.x+1)%monde.hauteur),(self.y)
+            coup_possibles.append(((self.x+1)%monde.largeur,self.y))
 
 
         if monde.grille[self.y][(self.x-1)%monde.largeur] == " ":
-            coup_possibles.append((self.x-1)%monde.hauteur),(self.y)
+            coup_possibles.append(((self.x-1)%monde.largeur,self.y))
 
 
         return coup_possibles
@@ -84,7 +84,7 @@ class Poisson:
             coup_a_jouer = choice(coup_possibles)
             y_preced = self.y
             x_preced = self.x
-
+            print(coup_a_jouer)
             self.y = coup_a_jouer[0]
             self.x = coup_a_jouer[1]
                      
@@ -112,7 +112,7 @@ class Requin:
         self.dead = False
     
     def deplacement_possible(self, monde):
-        coup_possibles= ()
+        coup_possibles= []
         if monde.grille[(self.y+1)%monde.hauteur][self.x] == " " or Poisson:
             coup_possibles.append(self.x, (self.y+1)%monde.hauteur)
 
@@ -142,23 +142,25 @@ class Requin:
 
             monde.grille[y_coup] [x_coup] = self
 
-            if self.duree_gestation >= 5:
+        if self.duree_gestation >= 5:
                 monde.grille [y_preced][x_preced] = Requin(x_preced)(y_preced)
-            else:
+        else:
                 monde.grille [y_preced][x_preced] = " "
         
     def vivre_une_journee(self, monde):
-        pass
+        self.duree_gestation += 1
+        self.se_deplacer(monde)
 
 monde=Monde(10,8)
 
-monde.peupler( 5,2)
+monde.peupler(5,2)
 
 Monde.afficher_monde(monde)
+# monde = ()
 for ligne in monde.grille:
     for case in ligne:  
         if isinstance(case, Poisson):
             case.se_deplacer(monde)
-
+  
 Monde.afficher_monde(monde)
 
