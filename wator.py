@@ -5,8 +5,8 @@ import os
 import math
 
 
-nb_poisson = 20
-nb_requin = 20
+nb_poisson = 5
+nb_requin = 2
 duree_gestation=4 
 
 
@@ -59,18 +59,20 @@ class Poisson:
         self.dead = False
     
     def deplacement_possible(self, monde):
-        coup_possibles= ()
-        if monde.grille[(self.y+1)%self.hauteur][self.x] == " ":
-            coup_possibles.append(self.x, (self.y+1)%monde.hauteur)
+        coup_possibles= []
+        if monde.grille[(self.y+1)%monde.hauteur][self.x] == " ":
+            coup_possibles.append((self.y+1)%monde.hauteur),(self.x)
 
-        if monde.grille[(self.y-1)%self.hauteur][self.x] == " ":
-            coup_possibles.append(self.x, (self.y-1)%monde.hauteur)
+        if monde.grille[(self.y-1)%monde.hauteur][self.x] == " ":
+            coup_possibles.append((self.y-1)%monde.hauteur),(self.x)
 
-        if monde.grille[self.y][(self.x+1)%self.largeur] == " ":
-            coup_possibles.append(self.x+1, (self.y-1)%monde.largeur)
 
-        if monde.grille[self.y][(self.x+1)%self.largeur] == " ":
-            coup_possibles.append(self.x+1, (self.y-1)%monde.largeur)
+        if monde.grille[self.y][(self.x+1)%monde.largeur] == " ":
+            coup_possibles.append((self.x+1)%monde.hauteur),(self.y)
+
+
+        if monde.grille[self.y][(self.x-1)%monde.largeur] == " ":
+            coup_possibles.append((self.x-1)%monde.hauteur),(self.y)
 
 
         return coup_possibles
@@ -80,21 +82,21 @@ class Poisson:
         coup_possibles = self.deplacement_possible(monde)
         if len(coup_possibles) != 0:
             coup_a_jouer = choice(coup_possibles)
-            x.coup = coup_a_jouer[0]
-            y.coup = coup_a_jouer[1]
-
-            x_preced = self.x
             y_preced = self.y
+            x_preced = self.x
 
-            self.x = x_coup
-            self.y = y_coup
-
+            self.y = coup_a_jouer[0]
+            self.x = coup_a_jouer[1]
+                     
+            y_coup = self.y 
+            x_coup = self.x
+            
             monde.grille[y_coup] [x_coup] = self
 
             if self.duree_gestation >= 5:
-                monde.grille [y_precd][x_preced] = Poisson(x_preced)(y_preced)
+                monde.grille [y_preced][x_preced] = Poisson(x_preced)(y_preced)
             else:
-                monde.grille [y_precd][x_preced] = " "
+                monde.grille [y_preced][x_preced] = " "
         
     def vivre_une_journee(self, monde):
         self.duree_gestation += 1
@@ -129,8 +131,8 @@ class Requin:
         coup_possibles = self.deplacement_possible(monde)
         if len(coup_possibles) != 0:
             coup_a_jouer = choice(coup_possibles)
-            x.coup = coup_a_jouer[0]
-            y.coup = coup_a_jouer[1]
+            x_coup = coup_a_jouer[0]
+            y_coup = coup_a_jouer[1]
 
             x_preced = self.x
             y_preced = self.y
@@ -141,19 +143,16 @@ class Requin:
             monde.grille[y_coup] [x_coup] = self
 
             if self.duree_gestation >= 5:
-                monde.grille [y_precd][x_preced] = Requin(x_preced)(y_preced)
+                monde.grille [y_preced][x_preced] = Requin(x_preced)(y_preced)
             else:
-                monde.grille [y_precd][x_preced] = " "
+                monde.grille [y_preced][x_preced] = " "
         
     def vivre_une_journee(self, monde):
         pass
 
-
 monde=Monde(10,8)
 
-
-
-monde.peupler( 20,20)
+monde.peupler( 5,2)
 
 Monde.afficher_monde(monde)
 for ligne in monde.grille:
