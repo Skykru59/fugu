@@ -12,6 +12,7 @@ duree_gestation=4
 
 class Monde:
     def __init__(self, largeur, hauteur):
+<<<<<<< HEAD
         self.largeur = 10
         self.hauteur = 8
         self.grille = [[ " " for _ in range(largeur)] for _ in range(hauteur)]
@@ -28,6 +29,23 @@ class Monde:
             print("\n")
 
         
+=======
+        self.largeur = largeur
+        self.hauteur = hauteur
+        self.grille = [[ None for _ in range(largeur)] for _ in range(hauteur)]
+        largeur=10
+        hauteur=8
+
+    
+    def afficher_monde(self):
+        
+        pass
+
+
+
+"""
+
+>>>>>>> f9a8223bd086ae6c9f7b75c61e8327ee84ade83a
     def peupler(self, nb_poisson, nb_requin):
             for i in range(nb_poisson):
                 x_rand = randint (0,self.largeur-1)
@@ -81,6 +99,7 @@ class Poisson:
         
     def vivre_une_journee(self, monde):
         pass
+<<<<<<< HEAD
 
 class Requin:
     def __init__(self, x, y ):
@@ -119,3 +138,7 @@ monde=Monde(10,8)
 monde.peupler( 20,20)
 
 Monde.afficher_monde(monde)
+=======
+    
+"""
+>>>>>>> f9a8223bd086ae6c9f7b75c61e8327ee84ade83a
