@@ -1,8 +1,5 @@
-from cmd import IDENTCHARS
 from random import Random, randint, choice, random
 from time import sleep
-import os
-import math
 
 
 nb_poisson = 5
@@ -12,8 +9,8 @@ duree_gestation=4
 
 class Monde:
     def __init__(self, largeur, hauteur):
-        self.largeur = 10
-        self.hauteur = 8
+        self.largeur = largeur
+        self.hauteur = hauteur
         self.grille = [[ " " for _ in range(largeur)] for _ in range(hauteur)]
     
     def afficher_monde(self):
@@ -33,13 +30,13 @@ class Monde:
                 x_rand = randint (0,self.largeur-1)
                 y_rand = randint (0, self.hauteur-1)
                 if self.grille[y_rand][x_rand] == " ":
-                    self.grille[y_rand][x_rand] = Poisson(y_rand,x_rand)
+                    self.grille[y_rand][x_rand] = Poisson(x_rand,y_rand)
                     
             for i in range(nb_requin):
                 x_rand = randint (0,self.largeur-1)
                 y_rand = randint (0, self.hauteur-1)
                 if self.grille[y_rand][x_rand] == " ":
-                    self.grille[y_rand][x_rand] = Requin(y_rand,x_rand)
+                    self.grille[y_rand][x_rand] = Requin(x_rand,y_rand)
 
         
 
@@ -61,10 +58,10 @@ class Poisson:
     def deplacement_possible(self, monde):
         coup_possibles= []
         if monde.grille[(self.y+1)%monde.hauteur][self.x] == " ":
-            coup_possibles.append(((self.y+1)%monde.hauteur,self.x))
+            coup_possibles.append((self.x, (self.y+1)%monde.hauteur))
 
         if monde.grille[(self.y-1)%monde.hauteur][self.x] == " ":
-            coup_possibles.append(((self.y-1)%monde.hauteur,self.x))
+            coup_possibles.append((self.x, (self.y-1)%monde.hauteur))
 
 
         if monde.grille[self.y][(self.x+1)%monde.largeur] == " ":
@@ -85,13 +82,13 @@ class Poisson:
             y_preced = self.y
             x_preced = self.x
             print(coup_a_jouer)
-            self.y = coup_a_jouer[0]
-            self.x = coup_a_jouer[1]
+            self.y = coup_a_jouer[1]
+            self.x = coup_a_jouer[0]
                      
             y_coup = self.y 
             x_coup = self.x
             
-            monde.grille[y_coup] [x_coup] = self
+            monde.grille[y_coup][x_coup] = self
 
             if self.duree_gestation >= 5:
                 monde.grille [y_preced][x_preced] = Poisson(x_preced)(y_preced)
