@@ -12,7 +12,6 @@ duree_gestation=4
 
 class Monde:
     def __init__(self, largeur, hauteur):
-<<<<<<< HEAD
         self.largeur = 10
         self.hauteur = 8
         self.grille = [[ " " for _ in range(largeur)] for _ in range(hauteur)]
@@ -29,23 +28,6 @@ class Monde:
             print("\n")
 
         
-=======
-        self.largeur = largeur
-        self.hauteur = hauteur
-        self.grille = [[ None for _ in range(largeur)] for _ in range(hauteur)]
-        largeur=10
-        hauteur=8
-
-    
-    def afficher_monde(self):
-        
-        pass
-
-
-
-"""
-
->>>>>>> f9a8223bd086ae6c9f7b75c61e8327ee84ade83a
     def peupler(self, nb_poisson, nb_requin):
             for i in range(nb_poisson):
                 x_rand = randint (0,self.largeur-1)
@@ -95,11 +77,28 @@ class Poisson:
        
     
     def se_deplacer(self, monde):
-        pass
+        coup_possibles = self.deplacement_possible(monde)
+        if len(coup_possibles) != 0:
+            coup_a_jouer = choice(coup_possibles)
+            x.coup = coup_a_jouer[0]
+            y.coup = coup_a_jouer[1]
+
+            x_preced = self.x
+            y_preced = self.y
+
+            self.x = x_coup
+            self.y = y_coup
+
+            monde.grille[y_coup] [x_coup] = self
+
+            if self.duree_gestation >= 5:
+                monde.grille [y_precd][x_preced] = Poisson(x_preced)(y_preced)
+            else:
+                monde.grille [y_precd][x_preced] = " "
         
     def vivre_une_journee(self, monde):
-        pass
-<<<<<<< HEAD
+        self.duree_gestation += 1
+        self.se_deplacer(monde)
 
 class Requin:
     def __init__(self, x, y ):
@@ -124,8 +123,27 @@ class Requin:
         if monde.grille[self.y][(self.x+1)%monde.largeur] == " " or Poisson:
             coup_possibles.append(self.x+1, (self.y-1)%monde.largeur)
     
+        return coup_possibles
+
     def se_deplacer(self, monde):
-        pass
+        coup_possibles = self.deplacement_possible(monde)
+        if len(coup_possibles) != 0:
+            coup_a_jouer = choice(coup_possibles)
+            x.coup = coup_a_jouer[0]
+            y.coup = coup_a_jouer[1]
+
+            x_preced = self.x
+            y_preced = self.y
+
+            self.x = x_coup
+            self.y = y_coup
+
+            monde.grille[y_coup] [x_coup] = self
+
+            if self.duree_gestation >= 5:
+                monde.grille [y_precd][x_preced] = Requin(x_preced)(y_preced)
+            else:
+                monde.grille [y_precd][x_preced] = " "
         
     def vivre_une_journee(self, monde):
         pass
@@ -138,7 +156,10 @@ monde=Monde(10,8)
 monde.peupler( 20,20)
 
 Monde.afficher_monde(monde)
-=======
-    
-"""
->>>>>>> f9a8223bd086ae6c9f7b75c61e8327ee84ade83a
+for ligne in monde.grille:
+    for case in ligne:  
+        if isinstance(case, Poisson):
+            case.se_deplacer(monde)
+
+Monde.afficher_monde(monde)
+
