@@ -1,163 +1,222 @@
-from random import Random, randint, choice, random
+from random import randint, choice
 from time import sleep
-
-
-nb_poisson = 5
-nb_requin = 2
-duree_gestation=4 
-
+import os
 
 class Monde:
     def __init__(self, largeur, hauteur):
         self.largeur = largeur
         self.hauteur = hauteur
-        self.grille = [[ " " for _ in range(largeur)] for _ in range(hauteur)]
+        self.grille = [[ "  " for _ in range(largeur)] for _ in range(hauteur)]
+        self.poissons = []
+        self.requins = []
     
     def afficher_monde(self):
+        """
+        Fonction qui affiche le monde dans la console.
+        """
         for ligne in self.grille:
             for case in ligne:
                 if isinstance(case,Poisson):
-                    print("P", end=" | ")
+                    print("🐠", end=" | ")
                 elif isinstance(case,Requin):
-                    print("R", end=" | ")   
+                    print("🦈", end=" | ")
                 else:
-                    print(" ", end=" | ")
+                    print("  ", end=" | ")
             print("\n")
 
-        
-    def peupler(self, nb_poisson, nb_requin):
-            for i in range(nb_poisson):
-                x_rand = randint (0,self.largeur-1)
-                y_rand = randint (0, self.hauteur-1)
-                if self.grille[y_rand][x_rand] == " ":
-                    self.grille[y_rand][x_rand] = Poisson(x_rand,y_rand)
-                    
-            for i in range(nb_requin):
-                x_rand = randint (0,self.largeur-1)
-                y_rand = randint (0, self.hauteur-1)
-                if self.grille[y_rand][x_rand] == " ":
-                    self.grille[y_rand][x_rand] = Requin(x_rand,y_rand)
 
-        
+    def peupler(self, nb_poisson, nb_requin):
+        """
+        Fonction qui fait apparaître les poissons sur le monde
+        : param nb_poisson (int) : Nombre de poissons à faire apparaître
+        : param nb_requi (int) : Nombre de requin à faire apparaître
+        """
+        nb_total = nb_poisson + nb_requin
+        case_total = self.hauteur * self.largeur
+        if nb_total > case_total:
+            print(ValueError(" \nLe nombre d'entités entrées est supérieur aux nombres de places disponnibles !\n".upper()))
+            return
+        max_poisson = 0
+        max_requin = 0
+        while nb_poisson > max_poisson:
+            random_y = randint(0, self.hauteur-1)
+            random_x = randint(0, self.largeur-1)
+            if self.grille[random_y][random_x] == "  ":
+                self.grille[random_y][random_x] = Poisson(random_y, random_x)
+                max_poisson += 1
+        while nb_requin > max_requin:
+            random_y = randint(0, self.hauteur-1)
+            random_x = randint(0, self.largeur-1)
+            if self.grille[random_y][random_x] == "  ":
+                self.grille[random_y][random_x] = Requin(random_y, random_x)
+                max_requin += 1
 
     
     def jouer_un_tour(self):
-        pass
+        # Reintialiser les Listes d'entités
+        self.poissons = []
+        self.requins = []
 
+        # Ajout des Poissons dans la Liste d'entités
+        for ligne in self.grille:
+            for case in ligne:
+                if isinstance(case, Poisson):
+                    self.poissons.append(case)
 
+        # Faire vivre une journée aux Poissons
+        for poisson in self.poissons:
+            poisson.vivre_une_journee(self)
+
+        # Ajout des Requins dans la Liste d'entités
+        for ligne in self.grille:
+            for case in ligne:
+                if isinstance(case, Requin):
+                    self.requins.append(case)
+
+        # Faire vivre une journée aux Poissons
+        for requin in self.requins:
+            requin.vivre_une_journee(self)
+
+        # Afficher le monde
+        self.afficher_monde()
 
 class Poisson:
-    def __init__(self, x, y ):
-        self.id = id
-        self.x, self.y = x, y
-        self.energy = float('inf')
-        self.duree_gestation = duree_gestation
-        self.duree_gestation = 0
-        self.dead = False
+    def __init__(self, y, x):
+        self.y = y
+        self.x = x
+        self.reproduction = 0
     
     def deplacement_possible(self, monde):
-        coup_possibles= []
-        if monde.grille[(self.y+1)%monde.hauteur][self.x] == " ":
-            coup_possibles.append((self.x, (self.y+1)%monde.hauteur))
+        deplacements = []
+        if monde.grille[(self.y+1) % monde.hauteur][self.x] == "  ":
+            deplacements.append(((self.y+1) % monde.hauteur, self.x))
+        
+        if monde.grille[(self.y-1) % monde.hauteur][self.x] == "  ":
+            deplacements.append(((self.y-1) % monde.hauteur, self.x))
+        
+        if monde.grille[self.y][(self.x+1) % monde.largeur] == "  ":
+            deplacements.append((self.y, (self.x+1) % monde.largeur))
+        
+        if monde.grille[self.y][(self.x-1) % monde.largeur] == "  ":
+            deplacements.append((self.y, (self.x-1) % monde.largeur))
 
-        if monde.grille[(self.y-1)%monde.hauteur][self.x] == " ":
-            coup_possibles.append((self.x, (self.y-1)%monde.hauteur))
+        return deplacements
 
 
-        if monde.grille[self.y][(self.x+1)%monde.largeur] == " ":
-            coup_possibles.append(((self.x+1)%monde.largeur,self.y))
+    def se_deplacer(self, monde, deplacements):
+        preced_y = self.y
+        preced_x = self.x
 
+        if deplacements != []:
+            choix = choice(deplacements)
+            if self.reproduction >= 4:
+                self.y = choix[0]
+                self.x = choix[1]
 
-        if monde.grille[self.y][(self.x-1)%monde.largeur] == " ":
-            coup_possibles.append(((self.x-1)%monde.largeur,self.y))
+                monde.grille[preced_y][preced_x] = Poisson(preced_y,preced_x)
 
+                monde.grille[choix[0]][choix[1]] = self
+                self.reproduction = 0
+            else: 
+                self.y = choix[0]
+                self.x = choix[1]
 
-        return coup_possibles
-       
-    
-    def se_deplacer(self, monde):
-        coup_possibles = self.deplacement_possible(monde)
-        if len(coup_possibles) != 0:
-            coup_a_jouer = choice(coup_possibles)
-            y_preced = self.y
-            x_preced = self.x
-            print(coup_a_jouer)
-            self.y = coup_a_jouer[1]
-            self.x = coup_a_jouer[0]
-                     
-            y_coup = self.y 
-            x_coup = self.x
-            
-            monde.grille[y_coup][x_coup] = self
-
-            if self.duree_gestation >= 5:
-                monde.grille [y_preced][x_preced] = Poisson(x_preced)(y_preced)
-            else:
-                monde.grille [y_preced][x_preced] = " "
+                monde.grille[choix[0]][choix[1]] = self
+                monde.grille[preced_y][preced_x] = "  "       
         
     def vivre_une_journee(self, monde):
-        self.duree_gestation += 1
-        self.se_deplacer(monde)
+        self.se_deplacer(monde, self.deplacement_possible(monde))
+        self.reproduction += 1
 
 class Requin:
-    def __init__(self, x, y ):
-        self.id = id
-        self.x, self.y = x, y
-        self.energy = 6
-        self.duree_gestation = duree_gestation
-        self.duree_gestation = 0
-        self.dead = False
+    def __init__(self, y, x):
+        self.y = y
+        self.x = x
+        self.reproduction = 0
+        self.energie = 6
     
     def deplacement_possible(self, monde):
-        coup_possibles= []
-        if monde.grille[(self.y+1)%monde.hauteur][self.x] == " " or Poisson:
-            coup_possibles.append(self.x, (self.y+1)%monde.hauteur)
-
-        if monde.grille[(self.y-1)%monde.hauteur][self.x] == " " or Poisson:
-            coup_possibles.append(self.x, (self.y-1)%monde.hauteur)
-
-        if monde.grille[self.y][(self.x+1)%monde.largeur] == " " or Poisson:
-            coup_possibles.append(self.x+1, (self.y-1)%monde.largeur)
-
-        if monde.grille[self.y][(self.x+1)%monde.largeur] == " " or Poisson:
-            coup_possibles.append(self.x+1, (self.y-1)%monde.largeur)
-    
-        return coup_possibles
-
-    def se_deplacer(self, monde):
-        coup_possibles = self.deplacement_possible(monde)
-        if len(coup_possibles) != 0:
-            coup_a_jouer = choice(coup_possibles)
-            x_coup = coup_a_jouer[0]
-            y_coup = coup_a_jouer[1]
-
-            x_preced = self.x
-            y_preced = self.y
-
-            self.x = x_coup
-            self.y = y_coup
-
-            monde.grille[y_coup] [x_coup] = self
-
-        if self.duree_gestation >= 5:
-                monde.grille [y_preced][x_preced] = Requin(x_preced)(y_preced)
+        deplacements = []
+        # Chercher les Poissons
+        if isinstance(monde.grille[(self.y+1) % monde.hauteur][self.x], Poisson):
+            deplacements.append(((self.y+1) % monde.hauteur, self.x))
+            return deplacements
+        elif isinstance(monde.grille[(self.y-1) % monde.hauteur][self.x], Poisson):
+            deplacements.append(((self.y-1) % monde.hauteur, self.x))
+            return deplacements
+        elif isinstance(monde.grille[self.y][(self.x+1) % monde.largeur], Poisson):
+            deplacements.append((self.y, (self.x+1) % monde.largeur))
+            return deplacements
+        elif isinstance(monde.grille[self.y][(self.x-1) % monde.largeur], Poisson):
+            deplacements.append((self.y, (self.x-1) % monde.largeur))
+            return deplacements
         else:
-                monde.grille [y_preced][x_preced] = " "
+            if monde.grille[(self.y+1) % monde.hauteur][self.x] == "  ":
+                deplacements.append(((self.y+1) % monde.hauteur, self.x))
+            
+            if monde.grille[(self.y-1) % monde.hauteur][self.x] == "  ":
+                deplacements.append(((self.y-1) % monde.hauteur, self.x))
+            
+            if monde.grille[self.y][(self.x+1) % monde.largeur] == "  ":
+                deplacements.append((self.y, (self.x+1) % monde.largeur))
+            
+            if monde.grille[self.y][(self.x-1) % monde.largeur] == "  ":
+                deplacements.append((self.y, (self.x-1) % monde.largeur))
+
+        return deplacements
+
+    def se_deplacer(self, monde, deplacements):
+        preced_y = self.y
+        preced_x = self.x
+        if self.energie == 0:
+            monde.grille[self.y][self.x] = "  "
+        elif deplacements != []:
+            choix = choice(deplacements)
+            # Vérifie si le choix est un poisson
+            if isinstance(monde.grille[choix[0]][choix[1]], Poisson):
+                if self.reproduction >= 4:
+                    self.y = choix[0]
+                    self.x = choix[1]
+
+                    monde.grille[preced_y][preced_x] = Requin(preced_y,preced_x)
+
+                    monde.grille[choix[0]][choix[1]] = self
+                    self.reproduction = 0
+                else:
+                    self.y = choix[0]
+                    self.x = choix[1]
+
+                    monde.grille[choix[0]][choix[1]] = self
+                    monde.grille[preced_y][preced_x] = "  "
+                # Ajout d'energie si le requin mange un poisson
+                self.energie += 1
+            elif self.reproduction >= 10:
+                self.y = choix[0]
+                self.x = choix[1]
+
+                monde.grille[preced_y][preced_x] = Requin(preced_y,preced_x)
+
+                monde.grille[choix[0]][choix[1]] = self
+                self.reproduction = 0
+            else: 
+                self.y = choix[0]
+                self.x = choix[1]
+
+                monde.grille[choix[0]][choix[1]] = self
+                monde.grille[preced_y][preced_x] = "  "
         
     def vivre_une_journee(self, monde):
-        self.duree_gestation += 1
-        self.se_deplacer(monde)
+        self.se_deplacer(monde, self.deplacement_possible(monde))
+        self.energie -= 1
+        if self.energie == 0:
+            monde.grille[self.y][self.x] = "  "
+        elif self.energie > 10:
+            self.energie = 10
+        self.reproduction += 1
 
-monde=Monde(10,8)
-
-monde.peupler(5,2)
-
-Monde.afficher_monde(monde)
-# monde = ()
-for ligne in monde.grille:
-    for case in ligne:  
-        if isinstance(case, Poisson):
-            case.se_deplacer(monde)
-  
-Monde.afficher_monde(monde)
-
+monde = Monde(10, 8)
+monde.peupler(10, 10)
+monde.afficher_monde()
+for _ in range(50):
+    print("-------------------------------------------------")
+    monde.jouer_un_tour()
